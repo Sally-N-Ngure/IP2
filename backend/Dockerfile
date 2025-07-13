@@ -1,29 +1,24 @@
-# Use an official Node runtime as a parent image
-FROM node:14 AS build
+# Start from the official lightweight Node.js 16 image based on Alpine Linux
+FROM node:16-alpine
 
-# Set the working directory in the container
-WORKDIR /usr/src/app
-
-# Copy the package.json and package-lock.json files to the container
-COPY package*.json ./
-
-# Install application dependencies
-RUN npm install
-
-# Copy the rest of the application code to the container
-COPY . .
-
-#Add multi-stage build
-FROM alpine:3.16.7
-
+# Set the working directory inside the container to /app
 WORKDIR /app
 
-RUN apk update && apk add --update nodejs
+# Copy only package.json and package-lock.json into the container 
+# This allows Docker to cache installed dependencies between builds if package files don’t change
+COPY package*.json ./
 
-COPY --from=build /usr/src/app /app
+# Install production dependencies exactly as specified in package-lock.json
+# npm ci is preferred for CI/CD and Docker because:
+# - it’s faster than npm install
+# - it does a clean install and ensures package-lock.json is strictly followed
+RUN npm ci
 
-# Expose the port the app runs on
+# Copy the rest of the application source code into the container, this includes server.js and any other app files
+COPY . .
+
+# Expose port 5000 to the host machine so it knows which port the backend is listening on
 EXPOSE 5000
 
-# Define the command to run your app
+# start the Node.js backend server by running server.js
 CMD ["node", "server.js"]
