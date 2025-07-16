@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    image: snngure/ip2-client:latest
+    container_name: ip2-client
+    ports:
+      - "3000:3000"
+    depends_on: 
+      - backend
+    networks:
+      - snnetwork
+    volumes:
+      - client_modules:/app/node_modules
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: snngure/ip2-backend:latest
+    container_name: ip2-backend
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./backend/.env
+    networks:
+      - snnetwork
+    volumes:
+      - backend_modules:/app/node_modules
+    
+networks:
+  snnetwork:
+    name: snnetwork
+    driver: bridge
+volumes:
+  client_modules:
+  backend_modules:
+
