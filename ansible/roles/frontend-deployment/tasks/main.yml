@@ -1,0 +1,31 @@
+- name: Create a custom Docker bridge network for the frontend and backend
+  community.docker.docker_network:
+    name: yolo_network
+    driver: bridge
+    state: present
+  become: yes
+  become_user: vagrant
+
+- name: Build frontend Docker image from Dockerfile
+  community.docker.docker_image:
+    name: yolo_frontend
+    build:
+      path: /home/vagrant/yolo/client/
+      pull: yes
+    source: build
+    state: present
+  become: yes
+  become_user: vagrant
+
+- name: Run Docker container from the built image
+  community.docker.docker_container:
+    name: yolo_frontend_container
+    image: yolo_frontend
+    state: started
+    recreate: yes
+    networks:
+      - name: yolo_network
+    ports:
+      - "3000:3000"
+    become: yes
+    become_user: vagrant

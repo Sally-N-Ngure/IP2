@@ -1,0 +1,21 @@
+- name: Build backend Docker image from Dockerfile
+  community.docker.docker_image:
+    name: yolo_backend
+    build:
+      path: /home/vagrant/yolo/backend/
+      pull: yes
+    source: build
+    state: present
+  become: yes
+  become_user: vagrant
+
+- name: Run Docker container from the built image
+  community.docker.docker_container:
+    name: yolo_backend_container
+    image: yolo_backend
+    state: started
+    recreate: yes
+    networks:
+      - name: yolo_network
+    ports:
+      - "5000:5000

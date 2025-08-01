@@ -1,0 +1,10 @@
+---
+- name: Ansible playbook to deploy YOLO app using prebuilt DockerHub images
+  hosts: all
+  become: true
+  roles: 
+    - docker-setup 
+    - git-setup
+    - clone-repository
+    - frontend-deployment
+    - backend-deployment

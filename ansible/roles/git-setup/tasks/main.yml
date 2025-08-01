@@ -1,0 +1,11 @@
+# tasks file for git-setup
+- name: Update the package index on the VM
+  apt:
+    update_cache: yes
+
+- name: Install Git
+  apt:
+    name:
+      - git
+    state: present
+
